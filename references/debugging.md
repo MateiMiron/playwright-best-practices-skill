@@ -16,7 +16,6 @@
 ```bash
 # Run with inspector
 PWDEBUG=1 npx playwright test
-
 # Or specific test
 PWDEBUG=1 npx playwright test login.spec.ts
 ```
@@ -115,6 +114,22 @@ test("manual trace", async ({ page, context }) => {
 ```
 
 ## Debugging Flaky Tests
+
+### Flaky Test Investigation Checklist
+
+Copy this checklist to track your debugging progress:
+
+```
+Flaky Test Investigation:
+- [ ] Step 1: Reproduce flakiness (`--repeat-each=10`)
+- [ ] Step 2: Enable full tracing (`trace: 'on'`)
+- [ ] Step 3: Check for race conditions (missing awaits)
+- [ ] Step 4: Verify locator stability (no dynamic IDs)
+- [ ] Step 5: Review network dependencies (mock or wait)
+- [ ] Step 6: Ensure test isolation (no shared state)
+- [ ] Step 7: If parallel-only flakiness, isolate per worker
+- [ ] Step 8: Confirm fix (run 10+ times)
+```
 
 ### Identify Flaky Tests
 
@@ -347,58 +362,6 @@ test("info example", async ({ page }, testInfo) => {
   // Custom output directory
   const outputPath = testInfo.outputPath("custom-file.txt");
 });
-```
-
-## VS Code Integration
-
-### Playwright Extension
-
-Install: `ms-playwright.playwright`
-
-Features:
-
-- Run/debug tests from editor
-- Pick locators
-- Record tests
-- View traces
-
-### Debug Configuration
-
-```json
-// .vscode/launch.json
-{
-  "version": "0.2.0",
-  "configurations": [
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "Debug Playwright Tests",
-      "program": "${workspaceFolder}/node_modules/.bin/playwright",
-      "args": ["test", "--debug"],
-      "cwd": "${workspaceFolder}",
-      "console": "integratedTerminal"
-    },
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "Debug Current Test File",
-      "program": "${workspaceFolder}/node_modules/.bin/playwright",
-      "args": ["test", "${relativeFile}", "--debug"],
-      "cwd": "${workspaceFolder}",
-      "console": "integratedTerminal"
-    }
-  ]
-}
-```
-
-### Settings
-
-```json
-// .vscode/settings.json
-{
-  "playwright.showTrace": true,
-  "playwright.reuseBrowser": true
-}
 ```
 
 ## Troubleshooting Checklist
