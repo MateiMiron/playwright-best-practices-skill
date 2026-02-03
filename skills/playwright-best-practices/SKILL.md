@@ -1,6 +1,6 @@
 ---
 name: playwright-best-practices
-description: Comprehensive guide for writing, debugging, and maintaining Playwright tests in TypeScript. Use when writing new Playwright tests, reviewing test code, fixing flaky tests, debugging test failures, setting up test infrastructure, implementing Page Object Model, configuring CI/CD pipelines, optimizing test performance, fixing selector issues, handling authentication, mocking APIs, organizing test suites, or troubleshooting Playwright issues. Covers E2E, component, API, and visual regression testing.
+description: Provides comprehensive guidance for writing, debugging, and maintaining Playwright tests in TypeScript. Use when writing new Playwright tests, reviewing test code, fixing flaky tests, debugging test failures, setting up test infrastructure, implementing Page Object Model, configuring CI/CD pipelines, optimizing test performance, fixing selector issues, handling authentication, mocking APIs, organizing test suites, or troubleshooting Playwright issues. Covers E2E, component, API, and visual regression testing.
 ---
 
 # Playwright Best Practices
@@ -105,3 +105,15 @@ What are you doing?
    ├─ Performance → performance.md
    └─ Project config → test-organization.md, fixtures-hooks.md
 ```
+
+## Test Validation Loop
+
+After writing or modifying tests:
+
+1. **Run tests**: `npx playwright test --reporter=list`
+2. **If tests fail**:
+   - Review error output and trace (`npx playwright show-trace`)
+   - Fix locators, waits, or assertions
+   - Re-run tests
+3. **Only proceed when all tests pass**
+4. **Run multiple times** for critical tests: `npx playwright test --repeat-each=5`

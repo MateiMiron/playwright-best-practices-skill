@@ -2,31 +2,13 @@
 
 ## Table of Contents
 
-1. [Basic Test Structure](#basic-test-structure)
-2. [Configuration](#configuration)
-3. [Test Types Overview](#test-types-overview)
-4. [E2E Tests](#e2e-tests)
-5. [Component Tests](#component-tests)
-6. [API Tests](#api-tests)
-7. [Visual Regression Tests](#visual-regression-tests)
-8. [Directory Structure](#directory-structure)
-9. [Tagging & Filtering](#tagging--filtering)
-
-## Basic Test Structure
-
-### Minimal Test Example
-
-```typescript
-import { test, expect } from "@playwright/test";
-
-test.describe("Feature Name", () => {
-  test("should perform expected behavior", async ({ page }) => {
-    await page.goto("/path");
-    await page.getByRole("button", { name: "Submit" }).click();
-    await expect(page.getByText("Success")).toBeVisible();
-  });
-});
-```
+1. [Configuration](#configuration)
+2. [E2E Tests](#e2e-tests)
+3. [Component Tests](#component-tests)
+4. [API Tests](#api-tests)
+5. [Visual Regression Tests](#visual-regression-tests)
+6. [Directory Structure](#directory-structure)
+7. [Tagging & Filtering](#tagging--filtering)
 
 ### Project Setup
 
@@ -69,15 +51,6 @@ export default defineConfig({
   },
 });
 ```
-
-## Test Types Overview
-
-| Type      | Purpose               | Speed  | Scope            |
-| --------- | --------------------- | ------ | ---------------- |
-| E2E       | Full user flows       | Slow   | Entire app       |
-| Component | UI component behavior | Fast   | Single component |
-| API       | Backend endpoints     | Fast   | API layer        |
-| Visual    | UI appearance         | Medium | Screenshots      |
 
 ## E2E Tests
 
@@ -269,73 +242,6 @@ test("handles slow API", async ({ page }) => {
   await page.goto("/dashboard");
   await expect(page.getByText("Loading...")).toBeVisible();
   await expect(page.getByText("test")).toBeVisible();
-});
-```
-
-### Using Request Fixture
-
-```typescript
-// tests/api/users.spec.ts
-import { test, expect } from "@playwright/test";
-
-test.describe("Users API", () => {
-  const baseURL = process.env.API_URL || "http://localhost:3000/api";
-
-  test("GET /users returns list", async ({ request }) => {
-    const response = await request.get(`${baseURL}/users`);
-
-    expect(response.ok()).toBeTruthy();
-    const users = await response.json();
-    expect(users).toBeInstanceOf(Array);
-    expect(users.length).toBeGreaterThan(0);
-  });
-
-  test("POST /users creates user", async ({ request }) => {
-    const response = await request.post(`${baseURL}/users`, {
-      data: {
-        name: "Test User",
-        email: "test@example.com",
-      },
-    });
-
-    expect(response.status()).toBe(201);
-    const user = await response.json();
-    expect(user.name).toBe("Test User");
-    expect(user.id).toBeDefined();
-  });
-
-  test("PUT /users/:id updates user", async ({ request }) => {
-    // Create user first
-    const createResponse = await request.post(`${baseURL}/users`, {
-      data: { name: "Original", email: "original@example.com" },
-    });
-    const { id } = await createResponse.json();
-
-    // Update
-    const updateResponse = await request.put(`${baseURL}/users/${id}`, {
-      data: { name: "Updated" },
-    });
-
-    expect(updateResponse.ok()).toBeTruthy();
-    const updated = await updateResponse.json();
-    expect(updated.name).toBe("Updated");
-  });
-
-  test("DELETE /users/:id removes user", async ({ request }) => {
-    // Create user first
-    const createResponse = await request.post(`${baseURL}/users`, {
-      data: { name: "ToDelete", email: "delete@example.com" },
-    });
-    const { id } = await createResponse.json();
-
-    // Delete
-    const deleteResponse = await request.delete(`${baseURL}/users/${id}`);
-    expect(deleteResponse.status()).toBe(204);
-
-    // Verify deleted
-    const getResponse = await request.get(`${baseURL}/users/${id}`);
-    expect(getResponse.status()).toBe(404);
-  });
 });
 ```
 

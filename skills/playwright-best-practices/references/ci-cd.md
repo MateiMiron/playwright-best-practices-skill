@@ -136,6 +136,7 @@ jobs:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     container:
+      # Use latest or more appropriate playwright version (match package.json)
       image: mcr.microsoft.com/playwright:v1.40.0-jammy
     steps:
       - uses: actions/checkout@v4
