@@ -335,6 +335,11 @@ export const test = base.extend<{ adminPage: Page; userPage: Page }>({
 
 ## Database Fixtures
 
+This section covers **per-test database fixtures** (isolation, transaction rollback). For related topics:
+
+- **Test data factories** (builders, Faker): See [test-data.md](test-data.md)
+- **One-time database setup** (migrations, snapshots): See [global-setup.md](global-setup.md#database-patterns)
+
 ### Transaction Rollback Pattern
 
 ```typescript

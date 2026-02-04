@@ -203,25 +203,9 @@ export default defineConfig({
 
 ### Authentication Setup
 
-```typescript
-// auth.setup.ts
-import { test as setup, expect } from "@playwright/test";
+Setup projects are the recommended way to handle authentication. They run before your main test projects and can use Playwright fixtures.
 
-const authFile = ".auth/user.json";
-
-setup("authenticate", async ({ page }) => {
-  await page.goto("/login");
-  await page.getByLabel("Email").fill(process.env.TEST_EMAIL!);
-  await page.getByLabel("Password").fill(process.env.TEST_PASSWORD!);
-  await page.getByRole("button", { name: "Sign in" }).click();
-
-  // Verify login succeeded
-  await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
-
-  // Save state
-  await page.context().storageState({ path: authFile });
-});
-```
+> **For complete authentication patterns** (storage state, multiple auth states, auth fixtures), see [fixtures-hooks.md](fixtures-hooks.md#authentication-patterns).
 
 ### Data Seeding Setup
 

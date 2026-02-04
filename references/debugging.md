@@ -118,30 +118,17 @@ test("manual trace", async ({ page, context }) => {
 
 ## Identifying Flaky Tests
 
-### Quick Detection
+If a test fails intermittently, it's likely flaky. Quick checks:
 
-```bash
-# Confirm flakiness by running multiple times
-npx playwright test tests/suspect.spec.ts --repeat-each=10
+| Behavior                               | Likely Cause                  | Next Step                              |
+| -------------------------------------- | ----------------------------- | -------------------------------------- |
+| Fails sometimes, passes other times    | Flaky - timing/race condition | [flaky-tests.md](flaky-tests.md)       |
+| Fails only with multiple workers       | Flaky - parallelism/isolation | [flaky-tests.md](flaky-tests.md)       |
+| Fails only in CI                       | Environment difference        | [CI Debugging](#debugging-in-ci) below |
+| Always fails                           | Bug in test or app            | Debug with tools above                 |
+| Always passes locally, always fails CI | CI-specific issue             | [ci-cd.md](ci-cd.md)                   |
 
-# Find first failure
-npx playwright test --repeat-each=100 --max-failures=1
-
-# Check if parallel-specific (passes with single worker?)
-npx playwright test --workers=1
-```
-
-### Is It Flaky?
-
-| Behavior                               | Likely Cause                  | Next Step                                  |
-| -------------------------------------- | ----------------------------- | ------------------------------------------ |
-| Fails sometimes, passes other times    | Flaky - timing/race condition | See [flaky-tests.md](flaky-tests.md)       |
-| Fails only with multiple workers       | Flaky - parallelism/isolation | See [flaky-tests.md](flaky-tests.md)       |
-| Fails only in CI                       | Environment difference        | See [CI Debugging](#debugging-in-ci) below |
-| Always fails                           | Bug in test or app            | Debug with tools above                     |
-| Always passes locally, always fails CI | CI-specific issue             | See [ci-cd.md](ci-cd.md)                   |
-
-For comprehensive flaky test investigation, root cause analysis, and fixing strategies, see **[flaky-tests.md](flaky-tests.md)**.
+> **For flaky test detection commands, root cause analysis, and fixing strategies**, see [flaky-tests.md](flaky-tests.md).
 
 ## Debugging Network Issues
 
@@ -171,21 +158,19 @@ test("debug network", async ({ page }) => {
 
 ### Wait for Specific API Response
 
+When debugging network-dependent issues, wait for specific API responses instead of arbitrary timeouts.
+
 ```typescript
-test("wait for API", async ({ page }) => {
-  // Start waiting BEFORE triggering the request
-  const responsePromise = page.waitForResponse(
-    (resp) => resp.url().includes("/api/data") && resp.status() === 200,
-  );
-
-  await page.getByRole("button", { name: "Load" }).click();
-  const response = await responsePromise;
-
-  // Inspect response
-  console.log("Status:", response.status());
-  console.log("Body:", await response.json());
-});
+// Start waiting BEFORE triggering the request
+const responsePromise = page.waitForResponse(
+  (resp) => resp.url().includes("/api/data") && resp.status() === 200,
+);
+await page.getByRole("button", { name: "Load" }).click();
+const response = await responsePromise;
+console.log("Status:", response.status());
 ```
+
+> **For comprehensive waiting patterns** (navigation, element state, network, polling), see [assertions-waiting.md](assertions-waiting.md#waiting-strategies).
 
 ### Debug Slow Requests
 
@@ -408,6 +393,8 @@ test("with logging", async ({ page }) => {
   await page.goto("/");
 });
 ```
+
+> **For comprehensive console error handling** (fail on errors, allowed patterns, fixtures), see [console-errors.md](console-errors.md).
 
 ### Custom Test Attachments
 

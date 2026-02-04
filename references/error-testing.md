@@ -162,6 +162,8 @@ test("handles failure during request", async ({ page }) => {
 
 ## Offline Testing
 
+This section covers **unexpected network failures** and error recovery. For **offline-first apps (PWAs)** with service workers, caching, and background sync, see [service-workers.md](service-workers.md#offline-testing).
+
 ### Go Offline During Session
 
 ```typescript
@@ -169,7 +171,7 @@ test("handles going offline", async ({ page, context }) => {
   await page.goto("/dashboard");
   await expect(page.getByTestId("data")).toBeVisible();
 
-  // Go offline
+  // Go offline unexpectedly
   await context.setOffline(true);
 
   // Try to refresh data
@@ -187,52 +189,27 @@ test("handles going offline", async ({ page, context }) => {
 });
 ```
 
-### Test Offline-First Features
+### Test Network Recovery
 
 ```typescript
-test("works offline with cached data", async ({ page, context }) => {
-  // Load page and data first
-  await page.goto("/notes");
-  await expect(page.getByText("Note 1")).toBeVisible();
+test("recovers gracefully when connection returns", async ({
+  page,
+  context,
+}) => {
+  await page.goto("/dashboard");
 
-  // Go offline
+  // Simulate connection drop
   await context.setOffline(true);
 
-  // Reload - should work from cache
-  await page.reload();
-  await expect(page.getByText("Note 1")).toBeVisible();
+  // App should show degraded state
+  await expect(page.getByRole("alert")).toContainText(/offline|connection/i);
 
-  // Can still create new note (queued)
-  await page.getByRole("button", { name: "New Note" }).click();
-  await page.getByLabel("Content").fill("Offline note");
-  await page.getByRole("button", { name: "Save" }).click();
-
-  await expect(page.getByText("Saved offline")).toBeVisible();
-});
-```
-
-### Test Offline Form Submission
-
-```typescript
-test("queues form submission when offline", async ({ page, context }) => {
-  await page.goto("/feedback");
-
-  // Go offline before submitting
-  await context.setOffline(true);
-
-  await page.getByLabel("Message").fill("Great app!");
-  await page.getByRole("button", { name: "Submit" }).click();
-
-  // Should queue, not fail
-  await expect(page.getByText("Saved. Will send when online.")).toBeVisible();
-
-  // Go online
+  // Connection restored
   await context.setOffline(false);
 
-  // Wait for sync
-  await expect(page.getByText("Feedback sent!")).toBeVisible({
-    timeout: 10000,
-  });
+  // Retry should work
+  await page.getByRole("button", { name: "Retry" }).click();
+  await expect(page.getByTestId("data")).toBeVisible();
 });
 ```
 

@@ -392,7 +392,7 @@ test("response includes security headers", async ({ page }) => {
 test("CSP blocks inline scripts", async ({ page }) => {
   const cspViolations: string[] = [];
 
-  // Listen for CSP violations
+  // Listen for CSP violations via console
   page.on("console", (msg) => {
     if (msg.text().includes("Content Security Policy")) {
       cspViolations.push(msg.text());
@@ -401,17 +401,18 @@ test("CSP blocks inline scripts", async ({ page }) => {
 
   await page.goto("/");
 
-  // Try to inject inline script
+  // Try to inject inline script - CSP should block it
   await page.evaluate(() => {
     const script = document.createElement("script");
     script.textContent = 'console.log("injected")';
     document.body.appendChild(script);
   });
 
-  // CSP should block it
   expect(cspViolations.length).toBeGreaterThan(0);
 });
 ```
+
+> **For comprehensive console monitoring** (fixtures, allowed patterns, fail on errors), see [console-errors.md](console-errors.md).
 
 ## Anti-Patterns to Avoid
 

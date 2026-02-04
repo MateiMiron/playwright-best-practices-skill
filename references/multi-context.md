@@ -1,5 +1,7 @@
 # Multi-Tab, Window & Popup Testing
 
+This file covers **single-user scenarios** with multiple browser tabs, windows, and popups. For **multi-user collaboration testing** (multiple users interacting simultaneously), see [multi-user.md](multi-user.md).
+
 ## Table of Contents
 
 1. [Popup Handling](#popup-handling)
@@ -195,48 +197,7 @@ test("mock OAuth flow", async ({ page, context }) => {
 
 ### OAuth Fixture
 
-```typescript
-// fixtures/oauth.fixture.ts
-import { test as base } from "@playwright/test";
-
-type OAuthFixtures = {
-  mockOAuth: (
-    provider: "google" | "github",
-    user: { name: string; email: string },
-  ) => Promise<void>;
-};
-
-export const test = base.extend<OAuthFixtures>({
-  mockOAuth: async ({ page }, use) => {
-    await use(async (provider, user) => {
-      await page.route(`**/auth/${provider}/callback**`, (route) =>
-        route.fulfill({
-          status: 302,
-          headers: {
-            Location: `/dashboard?user=${encodeURIComponent(user.email)}`,
-          },
-        }),
-      );
-
-      await page.route("**/api/auth/session", (route) =>
-        route.fulfill({
-          json: { user, authenticated: true },
-        }),
-      );
-    });
-  },
-});
-
-// Usage
-test("login with mocked Google", async ({ page, mockOAuth }) => {
-  await mockOAuth("google", { name: "Test User", email: "test@example.com" });
-
-  await page.goto("/login");
-  await page.getByRole("button", { name: "Sign in with Google" }).click();
-
-  await expect(page.getByText("Welcome, Test User")).toBeVisible();
-});
-```
+> **For comprehensive OAuth mocking patterns** (fixtures, multiple providers, SAML SSO), see [third-party.md](third-party.md#oauthsso-mocking). This section focuses on popup window handling mechanics for OAuth flows.
 
 ## Multiple Windows
 
@@ -263,34 +224,7 @@ test("sync between windows", async ({ context }) => {
 
 ### Different Users in Different Windows
 
-```typescript
-test("multi-user interaction", async ({ browser }) => {
-  // Create separate contexts for different users
-  const adminContext = await browser.newContext({
-    storageState: ".auth/admin.json",
-  });
-  const userContext = await browser.newContext({
-    storageState: ".auth/user.json",
-  });
-
-  const adminPage = await adminContext.newPage();
-  const userPage = await userContext.newPage();
-
-  // Admin approves user's request
-  await userPage.goto("/requests");
-  await userPage.getByRole("button", { name: "Submit Request" }).click();
-
-  await adminPage.goto("/admin/requests");
-  await expect(adminPage.getByText("Pending Request")).toBeVisible();
-  await adminPage.getByRole("button", { name: "Approve" }).click();
-
-  // User sees approval
-  await expect(userPage.getByText("Request Approved")).toBeVisible();
-
-  await adminContext.close();
-  await userContext.close();
-});
-```
+> **For multi-user collaboration patterns** (admin/user interactions, real-time collaboration, role-based testing, concurrent actions), see [multi-user.md](multi-user.md). This file focuses on single-user scenarios with multiple tabs/windows/popups.
 
 ## Tab Coordination
 

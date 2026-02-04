@@ -152,18 +152,14 @@ page.getByRole("listitem").nth(2); // 0-indexed
 
 ### Waiting for Elements
 
-Locators auto-wait, but you can be explicit:
+Locators auto-wait for actionability by default. For explicit state waiting:
 
 ```typescript
-// Wait for element to be visible
 await page.getByRole("button").waitFor({ state: "visible" });
-
-// Wait for element to be hidden
 await page.getByText("Loading").waitFor({ state: "hidden" });
-
-// Wait for element to be attached to DOM
-await page.getByTestId("result").waitFor({ state: "attached" });
 ```
+
+> **For comprehensive waiting strategies** (element state, navigation, network, polling with `toPass()`), see [assertions-waiting.md](assertions-waiting.md#waiting-strategies).
 
 ### Lists with Dynamic Items
 

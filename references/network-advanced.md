@@ -394,26 +394,12 @@ test("slow network experience", async ({ page, context }) => {
 
 ### Offline Mode
 
-```typescript
-test("offline handling", async ({ page, context }) => {
-  await page.goto("/dashboard");
+Use `context.setOffline(true/false)` to simulate network connectivity changes.
 
-  // Go offline
-  await context.setOffline(true);
-
-  // Trigger network request
-  await page.getByRole("button", { name: "Refresh" }).click();
-
-  // Should show offline message
-  await expect(page.getByText("You're offline")).toBeVisible();
-
-  // Go back online
-  await context.setOffline(false);
-
-  await page.getByRole("button", { name: "Retry" }).click();
-  await expect(page.getByText("Data refreshed")).toBeVisible();
-});
-```
+> **For comprehensive offline testing patterns:**
+>
+> - **Network failure simulation** (error recovery, graceful degradation): See [error-testing.md](error-testing.md#offline-testing)
+> - **Offline-first/PWA testing** (service workers, caching, background sync): See [service-workers.md](service-workers.md#offline-testing)
 
 ### Network Throttling Fixture
 

@@ -1,5 +1,10 @@
 # Test Data Factories & Generators
 
+This file covers **reusable test data builders** (factories, Faker, data generators). For related topics:
+
+- **Per-test database fixtures** (isolation, transaction rollback): See [fixtures-hooks.md](fixtures-hooks.md#database-fixtures)
+- **One-time database setup** (migrations, snapshots): See [global-setup.md](global-setup.md#database-patterns)
+
 ## Table of Contents
 
 1. [Factory Pattern](#factory-pattern)

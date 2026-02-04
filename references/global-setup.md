@@ -15,25 +15,11 @@
 
 ```typescript
 // global-setup.ts
-import { chromium, FullConfig } from "@playwright/test";
+import { FullConfig } from "@playwright/test";
 
 async function globalSetup(config: FullConfig) {
   console.log("Running global setup...");
-
-  // Example: Create authenticated state
-  const browser = await chromium.launch();
-  const page = await browser.newPage();
-
-  await page.goto("http://localhost:3000/login");
-  await page.getByLabel("Email").fill(process.env.TEST_EMAIL!);
-  await page.getByLabel("Password").fill(process.env.TEST_PASSWORD!);
-  await page.getByRole("button", { name: "Sign in" }).click();
-  await page.waitForURL("/dashboard");
-
-  // Save authentication state
-  await page.context().storageState({ path: ".auth/user.json" });
-
-  await browser.close();
+  // Perform one-time setup: start services, run migrations, etc.
 }
 
 export default globalSetup;
@@ -48,12 +34,10 @@ import { defineConfig } from "@playwright/test";
 export default defineConfig({
   globalSetup: require.resolve("./global-setup"),
   globalTeardown: require.resolve("./global-teardown"),
-
-  use: {
-    storageState: ".auth/user.json",
-  },
 });
 ```
+
+> **Authentication in Global Setup**: For authentication patterns using storage state in global setup, see [fixtures-hooks.md](fixtures-hooks.md#authentication-patterns). Setup projects are generally preferred for authentication as they provide access to Playwright fixtures.
 
 ### Global Setup with Return Value
 
@@ -138,6 +122,11 @@ export default globalTeardown;
 ```
 
 ## Database Patterns
+
+This section covers **one-time database setup** (migrations, snapshots, per-worker databases). For related topics:
+
+- **Per-test database fixtures** (isolation, transaction rollback): See [fixtures-hooks.md](fixtures-hooks.md#database-fixtures)
+- **Test data factories** (builders, Faker): See [test-data.md](test-data.md)
 
 ### Database Migration in Setup
 
@@ -352,19 +341,7 @@ export default defineConfig({
 });
 ```
 
-```typescript
-// auth.setup.ts
-import { test as setup, expect } from "@playwright/test";
-
-setup("authenticate", async ({ page }) => {
-  await page.goto("/login");
-  await page.getByLabel("Email").fill("user@example.com");
-  await page.getByLabel("Password").fill("password");
-  await page.getByRole("button", { name: "Sign in" }).click();
-
-  await page.context().storageState({ path: ".auth/user.json" });
-});
-```
+> **For complete authentication setup patterns**, see [fixtures-hooks.md](fixtures-hooks.md#authentication-patterns).
 
 ### Combining Both
 
@@ -425,51 +402,19 @@ Use **worker-scoped fixtures** instead of globalSetup when:
 | Setup depends on test configuration  | Fixtures receive test context and options            |
 | Resources need cleanup per worker    | Worker fixtures auto-cleanup when worker exits       |
 
-```typescript
-// fixtures.ts - Worker-scoped fixture (preferred for isolation)
-import { test as base } from "@playwright/test";
-
-export const test = base.extend<{}, { workerDatabase: string }>({
-  workerDatabase: [
-    async ({}, use, workerInfo) => {
-      // Each worker gets its own database
-      const dbName = `test_db_${workerInfo.workerIndex}`;
-      await createDatabase(dbName);
-      await runMigrations(dbName);
-
-      await use(dbName);
-
-      // Cleanup when worker exits
-      await dropDatabase(dbName);
-    },
-    { scope: "worker" },
-  ],
-});
-```
-
 ### Common Parallel Pitfall
 
 ```typescript
 // ❌ BAD: Global setup creates ONE user, all workers fight over it
-// global-setup.ts
 async function globalSetup() {
   await createUser({ email: "test@example.com" }); // Shared!
 }
 
-// ✅ GOOD: Each worker gets its own user via fixture
-export const test = base.extend<{}, { testUser: User }>({
-  testUser: [
-    async ({}, use, workerInfo) => {
-      const user = await createUser({
-        email: `test-${workerInfo.workerIndex}@example.com`,
-      });
-      await use(user);
-      await deleteUser(user.id);
-    },
-    { scope: "worker" },
-  ],
-});
+// ✅ GOOD: Each worker gets its own user via worker-scoped fixture
+// Uses workerInfo.workerIndex to create unique data per worker
 ```
+
+> **For worker-scoped fixture patterns** (per-worker databases, unique test data, `workerIndex` isolation), see [fixtures-hooks.md](fixtures-hooks.md#isolate-test-data-between-parallel-workers).
 
 ## Anti-Patterns to Avoid
 

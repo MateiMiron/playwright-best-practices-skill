@@ -58,7 +58,7 @@ Consult these references based on what you're doing:
 | **Clipboard testing**           | [browser-apis.md](references/browser-apis.md)                                                |
 | **Camera/microphone mocking**   | [browser-apis.md](references/browser-apis.md)                                                |
 | **Multi-tab/popup flows**       | [multi-context.md](references/multi-context.md)                                              |
-| **OAuth popup handling**        | [multi-context.md](references/multi-context.md), [third-party.md](references/third-party.md) |
+| **OAuth popup handling**        | [third-party.md](references/third-party.md), [multi-context.md](references/multi-context.md) |
 
 ### Debugging & Troubleshooting
 
@@ -172,7 +172,7 @@ What are you doing?
 │  ├─ Date/time dependent → clock-mocking.md
 │  ├─ WebSocket/real-time → websockets.md
 │  ├─ Geolocation/permissions → browser-apis.md
-│  ├─ OAuth/popups → multi-context.md, third-party.md
+│  ├─ OAuth/SSO mocking → third-party.md, multi-context.md
 │  ├─ Payments/email/SMS → third-party.md
 │  ├─ iFrames → iframes.md
 │  ├─ Canvas/WebGL/charts → canvas-webgl.md
@@ -193,7 +193,8 @@ What are you doing?
 │
 ├─ Testing error scenarios?
 │  ├─ Network failures → error-testing.md, network-advanced.md
-│  ├─ Offline mode → error-testing.md
+│  ├─ Offline (unexpected) → error-testing.md
+│  ├─ Offline-first/PWA → service-workers.md
 │  ├─ Error boundaries → error-testing.md
 │  └─ Form validation → error-testing.md
 │

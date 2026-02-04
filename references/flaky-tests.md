@@ -86,25 +86,21 @@ test.afterEach(async ({}, testInfo) => {
 
 ### Event Logging for Race Conditions
 
+Add comprehensive event logging to expose timing issues:
+
 ```typescript
-// Add comprehensive event logging to expose timing issues
 test.beforeEach(async ({ page }) => {
   page.on("console", (msg) =>
     console.log(`CONSOLE [${msg.type()}]:`, msg.text()),
   );
   page.on("pageerror", (err) => console.error("PAGE ERROR:", err.message));
   page.on("requestfailed", (req) =>
-    console.error(`REQUEST FAILED: ${req.method()} ${req.url()}`),
+    console.error(`REQUEST FAILED: ${req.url()}`),
   );
-
-  // Track navigation timing
-  page.on("framenavigated", (frame) => {
-    if (frame === page.mainFrame()) {
-      console.log(`NAVIGATED: ${frame.url()}`);
-    }
-  });
 });
 ```
+
+> **For comprehensive console error handling** (fail on errors, allowed patterns, fixtures), see [console-errors.md](console-errors.md).
 
 ### Network Timing Analysis
 
@@ -186,19 +182,18 @@ await page.getByLabel("Email address").fill("test@example.com");
 // ❌ BAD: Arbitrary sleep
 await page.click("#load-data");
 await page.waitForTimeout(3000); // Hope data loads in 3s
-await expect(page.locator(".data-row")).toHaveCount(10);
 
 // ✅ GOOD: Wait for specific condition
 await page.click("#load-data");
 await expect(page.locator(".data-row")).toHaveCount(10, { timeout: 10000 });
 
-// ✅ BETTER: Wait for network response
+// ✅ BETTER: Wait for network response, then assert
 await page.click("#load-data");
-await page.waitForResponse(
-  (resp) => resp.url().includes("/api/data") && resp.status() === 200,
-);
+await page.waitForResponse((r) => r.url().includes("/api/data"));
 await expect(page.locator(".data-row")).toHaveCount(10);
 ```
+
+> **For comprehensive waiting strategies** (navigation, element state, network, polling with `toPass()`), see [assertions-waiting.md](assertions-waiting.md#waiting-strategies).
 
 **Problem: Complex async state**
 

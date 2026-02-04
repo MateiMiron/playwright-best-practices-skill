@@ -400,3 +400,4 @@ test("reconnects after connection loss", async ({ page }) => {
 
 - **Network**: See [network-advanced.md](network-advanced.md) for HTTP mocking patterns
 - **Assertions**: See [assertions-waiting.md](assertions-waiting.md) for polling patterns
+- **Multi-User**: See [multi-user.md](multi-user.md) for real-time collaboration testing with multiple users

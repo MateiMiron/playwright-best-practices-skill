@@ -120,23 +120,15 @@ jobs:
       - run: npx playwright test --shard=${{ matrix.shard }}/4
 ```
 
+> **For comprehensive CI sharding** (blob reports, merging sharded results, full workflows), see [ci-cd.md](ci-cd.md#sharding).
+
 ## Test Optimization
 
 ### Reuse Authentication
 
-```typescript
-// playwright.config.ts
-export default defineConfig({
-  projects: [
-    { name: "setup", testMatch: /.*\.setup\.ts/ },
-    {
-      name: "tests",
-      use: { storageState: ".auth/user.json" },
-      dependencies: ["setup"],
-    },
-  ],
-});
-```
+Avoid logging in for every test. Use setup projects with storage state to authenticate once and reuse the session.
+
+> **For authentication patterns** (storage state, multiple auth states, setup projects), see [fixtures-hooks.md](fixtures-hooks.md#authentication-patterns).
 
 ### Reuse Page State (serial only — trade-off with isolation)
 
