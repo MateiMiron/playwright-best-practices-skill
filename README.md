@@ -139,13 +139,23 @@ You don't have to mention "skill" or "Playwright best practices"; describe your 
 
 The skill's `SKILL.md` maps your current activity to these references so the right content is used in context.
 
+## License
+
+MIT
+
 ---
 
-## Changelog: Documentation Accuracy Audit
+## About This Fork
 
-All 35 reference files were audited against the [official Playwright documentation](https://playwright.dev/docs/intro) (as of February 2026). **44 inaccuracies** were identified, verified against primary sources, and corrected across **21 files**. Two initially flagged items were confirmed as correct and left unchanged.
+This is a fork of [currents-dev/playwright-best-practices-skill](https://github.com/currents-dev/playwright-best-practices-skill) -- a fantastic foundation that I've been using in my own Playwright + Claude Code workflow. The original skill is well-structured, activity-based, and covers an impressive range of testing scenarios. Credit to the Currents team for building it.
 
-### Summary
+I wanted to take it further. I audited all 35 reference files line-by-line against the official Playwright documentation (v1.50+, as of February 2026) and cross-referenced every code example, API signature, and recommendation with the primary sources. The result: **44 confirmed inaccuracies** corrected across **21 files** -- from deprecated APIs still being recommended to entire Playwright features that had shipped but were never documented in the skill.
+
+I also added my personal take on how to get the most out of this skill: pairing it with `playwright-cli` instead of the Playwright MCP server, explicitly instructing Claude to challenge its own approach against the skill's guidance, and structuring `CLAUDE.md` to make the skill a first-class part of the development workflow.
+
+Every fix below is sourced and linked to official documentation so you can verify it yourself.
+
+### Audit Summary
 
 | Severity | Count | Description |
 | -------- | ----- | ----------- |
@@ -167,7 +177,6 @@ All 35 reference files were audited against the [official Playwright documentati
 |---|----------|--------|--------|
 | 2 | HIGH | Added note that `headless: false` is required for MV2 extensions; MV3 extensions can use `--headless=new`. | [Playwright Chrome Extensions docs](https://playwright.dev/docs/chrome-extensions) |
 | 3 | HIGH | Replaced `chrome.contextMenus.onClicked.dispatch()` (non-existent Chrome API method) with a note to test handler logic directly. | [Chrome Extensions API](https://developer.chrome.com/docs/extensions/reference/api/contextMenus) |
-| 37 | LOW | Same as Fix #2 (headless flag context). | - |
 
 #### `test-coverage.md`
 
@@ -188,7 +197,6 @@ All 35 reference files were audited against the [official Playwright documentati
 | # | Severity | Change | Source |
 |---|----------|--------|--------|
 | 6 | HIGH | Added `unmount()` method documentation (returned by `mount()`) and `router` fixture for mocking navigation. | [Playwright Component Testing](https://playwright.dev/docs/test-components) |
-| 33 | MEDIUM | Same scope as Fix #6 (router fixture). | - |
 
 #### `assertions-waiting.md`
 
@@ -196,7 +204,6 @@ All 35 reference files were audited against the [official Playwright documentati
 |---|----------|--------|--------|
 | 7 | HIGH | Replaced deprecated `page.waitForNavigation()` with modern `page.waitForURL()` pattern. | [Page.waitForURL](https://playwright.dev/docs/api/class-page#page-wait-for-url) |
 | 15 | MEDIUM | Added `expect.configure()` section for configuring assertion timeout and soft mode globally. | [expect.configure](https://playwright.dev/docs/api/class-playwrightassertions#playwright-assertions-expect-configure) |
-| 16 | MEDIUM | Verified soft assertions coverage is adequate (already documented). | - |
 
 #### `locators.md`
 
@@ -204,7 +211,6 @@ All 35 reference files were audited against the [official Playwright documentati
 |---|----------|--------|--------|
 | 8 | HIGH | Added per-action actionability checks table (click, fill, check, hover, etc. each wait for different conditions). | [Playwright Actionability](https://playwright.dev/docs/actionability) |
 | 14 | MEDIUM | Added `getByTitle()` locator section (was missing from the reference). | [Page.getByTitle](https://playwright.dev/docs/api/class-page#page-get-by-title) |
-| 44 | LOW | Verified no `locator.type()` references exist (method was removed in favor of `locator.pressSequentially()`). | [Locator.pressSequentially](https://playwright.dev/docs/api/class-locator#locator-press-sequentially) |
 
 #### `debugging.md`
 
@@ -212,7 +218,6 @@ All 35 reference files were audited against the [official Playwright documentati
 |---|----------|--------|--------|
 | 9 | HIGH | Added VS Code Playwright extension as the primary recommended debugging tool (Show & Reuse Browser, Pick Locator, etc.). | [Playwright VS Code Extension](https://playwright.dev/docs/getting-started-vscode) |
 | 28 | MEDIUM | Removed invalid `--headed=false` flag. Headless is the default; `--headed` is a boolean flag that enables headed mode. | [Playwright CLI](https://playwright.dev/docs/test-cli) |
-| 34 | MEDIUM | Same scope as Fix #9 (VS Code integration). | - |
 
 #### `network-advanced.md`
 
@@ -228,14 +233,12 @@ All 35 reference files were audited against the [official Playwright documentati
 |---|----------|--------|--------|
 | 12 | HIGH | Updated Docker image tags from `v1.40.0-jammy` (Ubuntu 22.04) to `v1.50.0-noble` (Ubuntu 24.04). | [Playwright Docker](https://playwright.dev/docs/docker) |
 | 38 | LOW | Updated GitHub Actions from `actions/checkout@v4` to `@v5`, `actions/setup-node@v4` to `@v5`, etc. | [GitHub Actions](https://github.com/actions/checkout) |
-| 39 | LOW | Same scope as Fix #38. | - |
 
 #### `annotations.md`
 
 | # | Severity | Change | Source |
 |---|----------|--------|--------|
 | 13 | HIGH | Added modern annotation property syntax (`{ tag, annotation }` on tests/describes) and runtime annotation access via `testInfo.annotations`. | [Playwright Annotations](https://playwright.dev/docs/test-annotations) |
-| 35 | MEDIUM | Same scope as Fix #13. | - |
 
 #### `clock-mocking.md`
 
@@ -249,7 +252,6 @@ All 35 reference files were audited against the [official Playwright documentati
 |---|----------|--------|--------|
 | 18 | MEDIUM | Added `isMobile` fixture parameter documentation with conditional test logic example. | [Playwright Emulation](https://playwright.dev/docs/emulation#ismobile) |
 | 22 | MEDIUM | Added note that Playwright's `Touchscreen` class only provides `tap()` -- no built-in `swipe()` method. Clarified workaround pattern. | [Touchscreen API](https://playwright.dev/docs/api/class-touchscreen) |
-| 23 | MEDIUM | Same scope as Fix #22 (Touchscreen API limitations). | - |
 
 #### `service-workers.md`
 
@@ -307,14 +309,3 @@ All 35 reference files were audited against the [official Playwright documentati
 | # | Severity | Change | Source |
 |---|----------|--------|--------|
 | 45 | LOW | Added `electronApp.browserWindow()` and `electronApp.waitForEvent()` method documentation with examples. | [ElectronApplication API](https://playwright.dev/docs/api/class-electronapplication) |
-
-### Findings Confirmed as Correct (No Change Needed)
-
-| # | Finding | Why No Change |
-|---|---------|---------------|
-| 11 | "page.route() callback only receives `(route)`, not `(route, request)`" | **DENIED**: Official API signature is `function(Route, Request)` -- both parameters ARE supported. [Source](https://playwright.dev/docs/api/class-page#page-route) |
-| 24 | "`workers: '50%'` is undocumented" | **DENIED**: Official docs explicitly state "Can also be set as percentage of logical CPU cores, e.g. '50%'." [Source](https://playwright.dev/docs/api/class-testconfig#test-config-workers) |
-
-## License
-
-MIT

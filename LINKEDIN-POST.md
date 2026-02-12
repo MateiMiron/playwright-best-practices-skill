@@ -4,54 +4,52 @@
 
 **I audited 35 Playwright skill reference files against the official docs. Here's what I found.**
 
-I've been working with Claude Code's skill system for Playwright test automation, and I recently took a deep dive into `playwright-best-practices-skill` by Currents — a set of 35 markdown files that teach Claude how to write, debug, and maintain Playwright tests following best practices.
+I've been deep in a Playwright + Claude Code workflow lately, and one of the tools that's been central to it is `playwright-best-practices-skill` by Currents -- a collection of 35 markdown reference files that teach Claude how to write, debug, and maintain Playwright tests the right way.
 
-It's genuinely one of the best skills out there. Well-structured, activity-based, and covers everything from E2E and component testing to accessibility, Electron apps, and browser extensions. Huge credit to the Currents team for building it.
+It's a great starting point. Well-structured, activity-based, covers everything from E2E and component testing to accessibility, Electron apps, and browser extensions. Huge credit to the Currents team for putting it together.
 
-But I wanted to push it further.
+But when I started relying on it heavily for a real project, I noticed things that didn't quite match what I was reading in the official Playwright docs. So I decided to do a proper audit.
 
-**The audit**
+**What I found**
 
-I compared every reference file against the official Playwright documentation (v1.50+). The result: 44 confirmed inaccuracies across 22 files — ranging from deprecated APIs still being recommended, to missing features that shipped in recent versions.
+I went through every reference file, line by line, and cross-referenced each code example, API signature, and recommendation against the official Playwright documentation (v1.50+). Every finding was then independently verified against the primary source before I touched anything.
 
-Some highlights:
-- `page.routeWebSocket()` — first-class WebSocket mocking (v1.48) was completely missing
-- `waitForNavigation()` was still recommended despite being deprecated in favor of `waitForURL()`
-- FID was listed as a Core Web Vital when it was replaced by INP in March 2024
-- `performance.timing` (deprecated) was used instead of the Navigation Timing Level 2 API
-- Docker image tags referenced Ubuntu 22.04 (jammy) instead of 24.04 (noble)
-- Several Playwright features like `mergeTests()`, `expect.configure()`, and `page.consoleMessages()` were undocumented
+The result: 44 confirmed inaccuracies across 22 files. Some were minor (outdated GitHub Actions versions), but others were significant:
 
-Every fix is sourced and linked to official docs. I published the fork with a full changelog: https://github.com/MateiMiron/playwright-best-practices-skill
+- `page.routeWebSocket()` -- first-class WebSocket mocking since v1.48 -- was completely missing. The skill only showed legacy `page.evaluate()` workarounds
+- `waitForNavigation()` was still the recommended approach despite being deprecated. `waitForURL()` is the modern replacement
+- FID was listed as a Core Web Vital when Google replaced it with INP back in March 2024
+- `performance.timing` (deprecated Navigation Timing Level 1) was used instead of the Level 2 API
+- Docker image tags pointed to Ubuntu 22.04 (jammy) when Playwright moved to 24.04 (noble)
+- Features like `mergeTests()`, `expect.configure()`, `page.consoleMessages()`, and `serviceWorkers: 'block'` were undocumented
+- A Chrome API method that doesn't exist (`chrome.contextMenus.onClicked.dispatch()`) was in the browser extensions guide
 
-**Why Skills > MCP for Playwright**
+Every fix is sourced and linked to official docs in the changelog.
 
-Through this work I've become a strong advocate for the Skills approach over MCP servers for domain knowledge delivery:
+Fork: https://github.com/MateiMiron/playwright-best-practices-skill
 
-- **Skills** teach Claude *what to do* — patterns, conventions, best practices. They load on-demand and cost dozens of tokens for the description.
-- **MCP servers** connect Claude to *data and tools*. The Playwright MCP server streams full accessibility trees and console output on every step — tens of thousands of tokens per interaction.
+**My take: Skills > MCP for test knowledge**
 
-For browser automation specifically, `playwright-cli` is 10-100x more token-efficient than the Playwright MCP server. It returns compact element references (`e15`, `e21`) instead of full accessibility trees, leaving more context window for what actually matters: reasoning about test architecture, Page Object Model patterns, and assertions.
+Through this work I've come to a strong personal preference: for Playwright testing, Skills beat MCP servers for knowledge delivery.
 
-Skills + playwright-cli = structured knowledge + efficient browser access. That's the combo.
+Skills teach Claude *what to do* -- patterns, conventions, architectural decisions. They load on-demand, cost a handful of tokens for the description, and bring in the full reference only when it's relevant.
 
-**How to use it**
+MCP servers connect Claude to tools and data. The Playwright MCP server streams full accessibility trees and console output on every interaction -- tens of thousands of tokens consumed just to look at a page.
 
-```bash
+For browser automation, I use `playwright-cli` instead. It returns compact element references (`e15`, `e21`) instead of full DOM trees, which means 10-100x less token usage and more context window left for what actually matters: reasoning about test architecture, Page Object Model design, and assertion strategy.
+
+Skills for knowledge. `playwright-cli` for browser access. That's the combo that works.
+
+**Try it**
+
+```
 npx skills add https://github.com/MateiMiron/playwright-best-practices-skill
 ```
 
-Then add to your `CLAUDE.md`:
+Then tell Claude to challenge its own approach against the skill's guidance in your `CLAUDE.md`. That's when it really clicks -- the AI stops defaulting to generic patterns and starts following documented best practices, explaining when it disagrees, and letting you decide.
 
-```
-## Required Skills
-- playwright-best-practices: Always consult this skill when writing or debugging
-  Playwright tests. Challenge your default approach against the skill's guidance.
-- playwright-cli: Use playwright-cli (not Playwright MCP) for browser interactions.
-```
+If you're building Playwright test suites with Claude Code, give it a shot.
 
-If you're building Playwright test suites with Claude Code, give it a try. The skill covers 35 topics across E2E, component, API, visual regression, accessibility, security, i18n, Electron, and browser extension testing.
-
-#PlaywrightTesting #ClaudeCode #TestAutomation #QualityEngineering #AIAssistedDevelopment #Skills #OpenSource
+#PlaywrightTesting #ClaudeCode #TestAutomation #QualityEngineering #AIAssistedDevelopment #OpenSource
 
 ---
