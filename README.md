@@ -9,11 +9,58 @@
 
 A skill that gives the AI specialized guidance for writing, debugging, and maintaining **Playwright** tests in **TypeScript**. Use it in any repo where you work with Playwright so the assistant follows best practices for E2E, component, API, visual regression, accessibility, security, i18n, Electron, and browser extension testing.
 
-## Installation
+## Quick Start
+
+### 1. Install the skill
 
 ```bash
-npx skills add https://github.com/currents-dev/playwright-best-practices-skill
+npx skills add https://github.com/MateiMiron/playwright-best-practices-skill
 ```
+
+This creates `.claude/skills/playwright-best-practices/` in your project with all 35 reference files.
+
+### 2. Add to your CLAUDE.md
+
+Add these lines to your project's `CLAUDE.md` to explicitly instruct Claude to use the skill and challenge its own approach against the documented best practices:
+
+```markdown
+## Required Skills
+
+- **playwright-best-practices**: Always consult this skill when writing, reviewing,
+  or debugging Playwright tests. Before implementing any test pattern, check the
+  relevant skill reference and prefer the documented approach over your default.
+  If your approach differs from the skill's guidance, explain why and let the user
+  decide which to use.
+
+- **playwright-cli**: Use `playwright-cli` (not Playwright MCP) for browser
+  interactions. It is 10-100x more token-efficient than MCP because it returns
+  compact element references instead of full accessibility trees.
+```
+
+### 3. Pair with playwright-cli for browser automation
+
+For exploring the app, generating tests, and debugging, use `playwright-cli` instead of the Playwright MCP server:
+
+```bash
+playwright-cli open https://your-app.com
+playwright-cli snapshot          # Returns compact element refs (e15, e21...)
+playwright-cli click e15         # Interact by reference
+playwright-cli screenshot        # Only when you need visual context
+```
+
+**Why playwright-cli over Playwright MCP?** The MCP server streams full accessibility trees and console output on every step, consuming tens of thousands of tokens per interaction. `playwright-cli` returns only compact element references, reducing token usage by **10-100x** and leaving more context for reasoning about test architecture, Page Object Model patterns, and assertions.
+
+### Why Skills Over MCP
+
+| Aspect | Skills | MCP Servers |
+| ------ | ------ | ----------- |
+| **Token cost** | Dozens of tokens for description; full content only when invoked | Tens of thousands for tool schemas + accessibility trees on every step |
+| **Context pressure** | Low -- references load on-demand | High -- fills context after a few interactions |
+| **Setup** | A folder with a SKILL.md file | Running server process, transport config, debugging connections |
+| **Composability** | Chain skills into workflows (explore -> plan -> generate -> heal) | Single-purpose connections |
+| **Knowledge delivery** | 35 reference files that load only when relevant | No equivalent for structured domain knowledge |
+
+Skills teach Claude *what to do* (procedures, patterns, conventions). MCP connects Claude to *data and tools* (databases, APIs, browsers). For Playwright testing, the knowledge of how to write good tests (skill) is more valuable than raw browser connectivity (MCP), especially when `playwright-cli` handles the browser part more efficiently.
 
 The skill is activity-based: the AI is directed to the right reference depending on what you're doing, so you get focused advice without loading everything at once.
 
