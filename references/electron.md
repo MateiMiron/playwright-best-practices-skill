@@ -492,6 +492,51 @@ export const test = base.extend({
 });
 ```
 
+
+## ElectronApplication Methods
+
+### Access BrowserWindow
+
+```typescript
+test("access browser window properties", async () => {
+  const electronApp = await electron.launch({ args: ["main.js"] });
+
+  const window = await electronApp.firstWindow();
+
+  // Get the BrowserWindow object for the page
+  const browserWindow = await electronApp.browserWindow(window);
+
+  // Access BrowserWindow properties
+  const bounds = await browserWindow.evaluate((bw) => bw.getBounds());
+  expect(bounds.width).toBeGreaterThan(0);
+
+  const isVisible = await browserWindow.evaluate((bw) => bw.isVisible());
+  expect(isVisible).toBe(true);
+
+  await electronApp.close();
+});
+```
+
+### Wait for Events
+
+```typescript
+test("wait for electron events", async () => {
+  const electronApp = await electron.launch({ args: ["main.js"] });
+
+  // Wait for a specific event from the Electron app
+  const windowPromise = electronApp.waitForEvent("window");
+
+  // Trigger action that opens a new window
+  const mainWindow = await electronApp.firstWindow();
+  await mainWindow.getByRole("button", { name: "New Window" }).click();
+
+  const newWindow = await windowPromise;
+  await expect(newWindow.getByRole("heading")).toBeVisible();
+
+  await electronApp.close();
+});
+```
+
 ## Anti-Patterns to Avoid
 
 | Anti-Pattern                          | Problem                      | Solution                                     |

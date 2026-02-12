@@ -80,6 +80,53 @@ test("sends correct message format", async ({ page }) => {
 
 ## Mocking WebSocket Messages
 
+### Using page.routeWebSocket() (Recommended)
+
+Since Playwright v1.48, use `page.routeWebSocket()` for first-class WebSocket mocking instead of manually patching the WebSocket constructor:
+
+```typescript
+test("mock websocket with routeWebSocket", async ({ page }) => {
+  // Intercept WebSocket connections
+  await page.routeWebSocket("**/ws/chat", (ws) => {
+    // Send a message from the "server" to the client
+    ws.send("Hello from mock server!");
+
+    // Listen for messages from the client
+    ws.onMessage((message) => {
+      if (message === "ping") {
+        ws.send("pong");
+      }
+    });
+  });
+
+  await page.goto("/chat");
+  await expect(page.getByText("Hello from mock server!")).toBeVisible();
+});
+```
+
+```typescript
+test("routeWebSocket with server connection", async ({ page }) => {
+  // Connect to the real server while intercepting messages
+  await page.routeWebSocket("**/ws/chat", (ws) => {
+    const server = ws.connectToServer();
+
+    // Modify messages from client to server
+    ws.onMessage((message) => {
+      server.send(message + " (modified)");
+    });
+
+    // Forward server messages to client
+    server.onMessage((message) => {
+      ws.send(message);
+    });
+  });
+
+  await page.goto("/chat");
+});
+```
+
+> **Note**: `page.routeWebSocket()` is the recommended approach for WebSocket mocking. The patterns below using `page.evaluate()` and `addInitScript()` are legacy workarounds for older Playwright versions.
+
 ### Inject Messages via Page Evaluate
 
 ```typescript

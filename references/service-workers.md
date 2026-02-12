@@ -11,6 +11,13 @@
 
 ## Service Worker Basics
 
+> **Tip**: If you want to **prevent** service workers from interfering with your tests, you can block them at the context level:
+> ```typescript
+> const context = await browser.newContext({
+>   serviceWorkers: 'block', // Blocks all service worker registrations
+> });
+> ```
+
 ### Waiting for Service Worker Registration
 
 ```typescript
@@ -372,15 +379,15 @@ test("handles push notification", async ({ context, page }) => {
   const swPromise = context.waitForEvent("serviceworker");
   const sw = await swPromise;
 
-  // Simulate push message to service worker
+  // Note: PushEvent and PushMessageData constructors are not available in
+  // service worker scope. Instead, test the push handler logic directly:
   await sw.evaluate(async () => {
-    // Dispatch push event
-    const pushEvent = new PushEvent("push", {
-      data: new PushMessageData(
-        JSON.stringify({ title: "Test", body: "Push message" }),
-      ),
-    });
-    self.dispatchEvent(pushEvent);
+    // Call your push handler directly with mock data
+    const mockData = { title: "Test", body: "Push message" };
+    // If your SW exposes a handlePush function:
+    await self.handlePush?.(mockData);
+    // Or dispatch a synthetic event (limited, may not include .data):
+    self.dispatchEvent(new Event("push"));
   });
 
   // Note: Actual notification display testing is limited in Playwright

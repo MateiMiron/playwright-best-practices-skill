@@ -10,6 +10,22 @@
 
 ## Capturing Console Messages
 
+### Using page.consoleMessages() (v1.56+)
+
+Starting with Playwright v1.56, you can retrieve all console messages collected so far using `page.consoleMessages()`:
+
+```typescript
+test("check console messages", async ({ page }) => {
+  await page.goto("/");
+
+  // Get all console messages collected so far
+  const messages = page.consoleMessages();
+  const errors = messages.filter((msg) => msg.type() === "error");
+
+  expect(errors).toHaveLength(0);
+});
+```
+
 ### Basic Console Capture
 
 ```typescript

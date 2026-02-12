@@ -14,6 +14,18 @@
 
 ## Debug Tools
 
+### VS Code Integration (Recommended)
+
+The **Playwright Test for VS Code** extension provides the most integrated debugging experience:
+
+- **Show & Reuse Browser**: See the browser during test execution
+- **Pick Locator**: Click elements in the browser to generate locators
+- **Run/Debug individual tests**: Click the play button next to any test
+- **Live test editing**: Edit tests and see results in real-time
+- **Step-through debugging**: Set breakpoints and debug like any TypeScript code
+
+Install from the VS Code Marketplace: search for "Playwright Test for VS Code".
+
 ### Playwright Inspector
 
 ```bash
@@ -194,7 +206,7 @@ test("find slow requests", async ({ page }) => {
 
 ```bash
 # Run in headless mode like CI
-CI=true npx playwright test --headed=false
+CI=true npx playwright test
 
 # Match CI browser versions
 npx playwright install --with-deps

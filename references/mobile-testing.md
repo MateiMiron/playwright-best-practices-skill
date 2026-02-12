@@ -44,6 +44,20 @@ test("custom mobile device", async ({ page }) => {
 });
 ```
 
+> **Note**: Device descriptors include `isMobile` and `defaultBrowserType` properties. The `isMobile` fixture parameter is available in tests and controls viewport behavior and touch event simulation. Use it for conditional test logic:
+
+```typescript
+test("conditional mobile behavior", async ({ page, isMobile }) => {
+  await page.goto("/");
+
+  if (isMobile) {
+    await expect(page.getByRole("button", { name: "Menu" })).toBeVisible();
+  } else {
+    await expect(page.getByRole("navigation")).toBeVisible();
+  }
+});
+```
+
 ### Test Across Multiple Devices
 
 ```typescript
@@ -81,6 +95,8 @@ test("tap to interact", async ({ page }) => {
 ```
 
 ### Swipe
+
+> **Note**: Playwright's `Touchscreen` class only provides `tap()`. There is no built-in `swipe()` method. The pattern below simulates swipe using `touchscreen.tap()` + `mouse.move()` as a workaround.
 
 ```typescript
 test("swipe carousel", async ({ page }) => {

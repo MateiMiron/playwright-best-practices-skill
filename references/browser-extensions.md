@@ -61,7 +61,7 @@ export const test = base.extend<ExtensionFixtures>({
     const pathToExtension = path.join(__dirname, "../extension");
 
     const context = await chromium.launchPersistentContext("", {
-      headless: false,
+      headless: false, // Required for MV2; for MV3, use --headless=new
       args: [
         `--disable-extensions-except=${pathToExtension}`,
         `--load-extension=${pathToExtension}`,
@@ -448,10 +448,12 @@ test("context menu actions", async ({ context, extensionId }) => {
     window.getSelection()?.addRange(range);
   });
 
-  // Trigger context menu action programmatically
+  // Note: chrome.contextMenus.onClicked.dispatch() does not exist in the Chrome API.
+  // Context menu clicks cannot be triggered programmatically. Instead, test the
+  // handler logic directly by calling the function that onClicked would invoke:
   await serviceWorker.evaluate(async () => {
-    // Simulate the click handler
-    chrome.contextMenus.onClicked.dispatch(
+    // Call your handler function directly with the expected arguments
+    await handleContextMenuClick(
       { menuItemId: "test-menu", selectionText: "selected text" },
       { id: 1, url: "https://example.com" },
     );

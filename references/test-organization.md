@@ -166,12 +166,13 @@ test("mocks based on request", async ({ page }) => {
 
 // Mock with delay (simulate slow network)
 test("handles slow API", async ({ page }) => {
-  await page.route("**/api/data", (route) =>
-    route.fulfill({
+  await page.route("**/api/data", async (route) => {
+    // delay is not a valid route.fulfill() option — use setTimeout instead
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await route.fulfill({
       json: { data: "test" },
-      delay: 2000, // 2 second delay
-    }),
-  );
+    });
+  });
 
   await page.goto("/dashboard");
   await expect(page.getByText("Loading...")).toBeVisible();
@@ -341,6 +342,26 @@ test("checkout flow @e2e @critical", async ({ page }) => {
 test.describe("API tests @api", () => {
   test("create user", async ({ request }) => {
     // ...
+  });
+});
+```
+
+### Modern Tag Syntax (Recommended)
+
+Use the `tag` property on tests and describes for structured tagging:
+
+```typescript
+test("user login", { tag: "@smoke" }, async ({ page }) => {
+  // Tagged with @smoke
+});
+
+test("checkout flow", { tag: ["@e2e", "@critical"] }, async ({ page }) => {
+  // Multiple tags
+});
+
+test.describe("API tests", { tag: "@api" }, () => {
+  test("create user", async ({ request }) => {
+    // Inherits @api tag from describe
   });
 });
 ```

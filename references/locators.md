@@ -87,6 +87,13 @@ page.getByText("Welcome to our site", { exact: true });
 page.getByText(/welcome/i);
 ```
 
+### getByTitle
+
+```typescript
+page.getByTitle("Close dialog");
+page.getByTitle(/settings/i);
+```
+
 ### getByTestId
 
 Configure custom test ID attribute in `playwright.config.ts`:
@@ -152,7 +159,15 @@ page.getByRole("listitem").nth(2); // 0-indexed
 
 ### Waiting for Elements
 
-Locators auto-wait for actionability by default. For explicit state waiting:
+Locators auto-wait for actionability by default. Different actions wait for different conditions:
+
+- **`click()`**: Visible, stable, receives events, enabled, not obscured
+- **`fill()`**: Visible, enabled, editable
+- **`check()`/`uncheck()`**: Visible, stable, enabled, not obscured
+- **`selectOption()`**: Visible, enabled
+- **`hover()`**: Visible, stable, receives events
+
+For explicit state waiting:
 
 ```typescript
 await page.getByRole("button").waitFor({ state: "visible" });

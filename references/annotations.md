@@ -261,6 +261,52 @@ export class CheckoutPage {
 
 ## Custom Annotations
 
+### Annotation Property Syntax (Recommended)
+
+Use the `annotation` property on tests for structured annotations:
+
+```typescript
+test("login flow", {
+  tag: ["@smoke", "@auth"],
+  annotation: {
+    type: "issue",
+    description: "https://github.com/org/repo/issues/123",
+  },
+}, async ({ page }) => {
+  // Test with structured metadata
+});
+
+// Multiple annotations
+test("checkout", {
+  tag: "@e2e",
+  annotation: [
+    { type: "issue", description: "JIRA-456" },
+    { type: "owner", description: "team-payments" },
+  ],
+}, async ({ page }) => {
+  // ...
+});
+```
+
+### Reading Annotations at Runtime
+
+Access annotations from `testInfo`:
+
+```typescript
+test("annotated test", async ({ page }, testInfo) => {
+  // Read annotations
+  for (const annotation of testInfo.annotations) {
+    console.log(`${annotation.type}: ${annotation.description}`);
+  }
+
+  // Add annotation at runtime
+  testInfo.annotations.push({
+    type: "performance",
+    description: `Load time: ${Date.now()}ms`,
+  });
+});
+```
+
 ### Add Annotations
 
 ```typescript

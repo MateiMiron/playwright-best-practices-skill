@@ -9,6 +9,8 @@
 5. [Advanced Patterns](#advanced-patterns)
 6. [CI Integration](#ci-integration)
 
+> **Important**: The `page.coverage` APIs (`startJSCoverage()`, `startCSSCoverage()`, etc.) are **Chromium-only**. They are not available in Firefox or WebKit. Tests using these APIs should be restricted to Chromium projects.
+
 ## Coverage Setup
 
 ### Install Dependencies
@@ -137,6 +139,8 @@ test("track specific module coverage", async ({ page }) => {
 ```
 
 ### CSS Coverage
+
+> **Note**: `startCSSCoverage()` supports `resetOnNavigation` but does not accept `reportAnonymousScripts` (that option is only for JS coverage).
 
 ```typescript
 test("collect CSS coverage", async ({ page }) => {

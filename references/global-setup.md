@@ -306,6 +306,8 @@ export default globalSetup;
 
 ## Setup Projects vs Global Setup
 
+> **Recommendation**: Playwright recommends **project dependencies** as the primary approach for setup tasks (especially authentication). Project dependencies provide access to Playwright fixtures like `page` and `request`, can be parallelized, and are more composable. Use `globalSetup` only for tasks that truly need to run once before all projects (e.g., starting services, database migrations).
+
 ### When to Use Each
 
 | Use Global Setup                      | Use Setup Projects                       |

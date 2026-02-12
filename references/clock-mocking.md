@@ -250,6 +250,50 @@ export const test = base.extend<TimezoneFixtures>({
 });
 ```
 
+### Additional Clock API Methods
+
+```typescript
+test("pauseAt - freeze time at specific point", async ({ page }) => {
+  await page.clock.install({ time: new Date("2025-01-15T09:00:00") });
+  await page.goto("/dashboard");
+
+  // Advance time and pause at a specific moment
+  await page.clock.pauseAt(new Date("2025-01-15T10:00:00"));
+  // Time is now frozen at 10:00 AM
+  await expect(page.getByText("10:00 AM")).toBeVisible();
+});
+
+test("resume - let time flow after pausing", async ({ page }) => {
+  await page.clock.install({ time: new Date("2025-01-15T09:00:00") });
+  await page.goto("/clock-demo");
+
+  await page.clock.pauseAt(new Date("2025-01-15T09:30:00"));
+  // Time frozen at 9:30
+
+  await page.clock.resume();
+  // Time flows again from 9:30
+});
+
+test("setSystemTime - change system time without affecting timers", async ({ page }) => {
+  await page.clock.install({ time: new Date("2025-01-15T09:00:00") });
+  await page.goto("/");
+
+  // Jump system time (Date.now()) without firing timers
+  await page.clock.setSystemTime(new Date("2025-06-15T09:00:00"));
+  await expect(page.getByText("June 15")).toBeVisible();
+});
+
+test("runFor - advance time by duration firing timers", async ({ page }) => {
+  await page.clock.install({ time: new Date("2025-01-15T09:00:00") });
+  await page.goto("/timer-app");
+
+  // Advance by 5 seconds, firing any timers in that range
+  await page.clock.runFor(5000);
+  // Or use string format
+  await page.clock.runFor("00:30"); // 30 seconds
+});
+```
+
 ## Timer Mocking
 
 ### Mock setInterval

@@ -10,6 +10,8 @@
 
 ## Axe-Core Integration
 
+> **Note**: The `page.accessibility.snapshot()` API has been removed from Playwright. Use `@axe-core/playwright` for accessibility testing instead, as shown in the examples below.
+
 ### Setup
 
 ```bash

@@ -273,6 +273,23 @@ test("cleanup tabs after test", async ({ context }) => {
 });
 ```
 
+### Listing All Browser Contexts
+
+```typescript
+test("manage contexts", async ({ browser }) => {
+  const context1 = await browser.newContext();
+  const context2 = await browser.newContext();
+
+  // Get all open contexts
+  const contexts = browser.contexts();
+  expect(contexts.length).toBe(2);
+
+  // Clean up
+  await context1.close();
+  await context2.close();
+});
+```
+
 ## Anti-Patterns to Avoid
 
 | Anti-Pattern            | Problem                        | Solution                                   |

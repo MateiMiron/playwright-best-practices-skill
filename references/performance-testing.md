@@ -11,7 +11,7 @@
 
 ## Core Web Vitals
 
-### Measure LCP, FID, CLS
+### Measure LCP, INP, CLS
 
 ```typescript
 test("core web vitals within thresholds", async ({ page }) => {
@@ -69,10 +69,10 @@ test("web vitals with library", async ({ page }) => {
   });
 
   await page.evaluate(() => {
-    const { onLCP, onFID, onCLS, onFCP, onTTFB } = (window as any).webVitals;
+    const { onLCP, onINP, onCLS, onFCP, onTTFB } = (window as any).webVitals;
 
     onLCP((metric: any) => ((window as any).__vitals.lcp = metric.value));
-    onFID((metric: any) => ((window as any).__vitals.fid = metric.value));
+    onINP((metric: any) => ((window as any).__vitals.inp = metric.value));
     onCLS((metric: any) => ((window as any).__vitals.cls = metric.value));
     onFCP((metric: any) => ((window as any).__vitals.fcp = metric.value));
     onTTFB((metric: any) => ((window as any).__vitals.ttfb = metric.value));
@@ -90,7 +90,7 @@ test("web vitals with library", async ({ page }) => {
 
   // Assertions
   if (vitals.lcp) expect(vitals.lcp).toBeLessThan(2500);
-  if (vitals.fid) expect(vitals.fid).toBeLessThan(100);
+  if (vitals.inp) expect(vitals.inp).toBeLessThan(200); // INP < 200ms (replaced FID as Core Web Vital in March 2024)
   if (vitals.cls) expect(vitals.cls).toBeLessThan(0.1);
 });
 ```
@@ -322,6 +322,8 @@ export const test = base.extend<PerformanceFixtures>({
 ## Lighthouse Integration
 
 ### Using playwright-lighthouse
+
+> **Note**: The `playwright-lighthouse` package provides integration between Playwright and Lighthouse. Install it with `npm install -D playwright-lighthouse lighthouse`.
 
 ```bash
 npm install -D playwright-lighthouse lighthouse

@@ -28,9 +28,9 @@ jobs:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 20
           cache: "npm"
@@ -44,7 +44,7 @@ jobs:
       - name: Run Playwright tests
         run: npx playwright test
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         if: ${{ !cancelled() }}
         with:
           name: playwright-report
@@ -71,9 +71,9 @@ jobs:
         shardIndex: [1, 2, 3, 4]
         shardTotal: [4]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 20
           cache: "npm"
@@ -89,7 +89,7 @@ jobs:
 
       - name: Upload blob report
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: blob-report-${{ matrix.shardIndex }}
           path: blob-report
@@ -100,9 +100,9 @@ jobs:
     needs: [test]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 20
           cache: "npm"
@@ -111,7 +111,7 @@ jobs:
         run: npm ci
 
       - name: Download blob reports
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           path: all-blob-reports
           pattern: blob-report-*
@@ -121,7 +121,7 @@ jobs:
         run: npx playwright merge-reports --reporter html ./all-blob-reports
 
       - name: Upload HTML report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: html-report
           path: playwright-report
@@ -137,11 +137,11 @@ jobs:
     runs-on: ubuntu-latest
     container:
       # Use latest or more appropriate playwright version (match package.json)
-      image: mcr.microsoft.com/playwright:v1.40.0-jammy
+      image: mcr.microsoft.com/playwright:v1.50.0-noble
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 20
           cache: "npm"
@@ -160,7 +160,7 @@ jobs:
 ### Dockerfile
 
 ```dockerfile
-FROM mcr.microsoft.com/playwright:v1.40.0-jammy
+FROM mcr.microsoft.com/playwright:v1.50.0-noble
 
 WORKDIR /app
 
@@ -357,7 +357,7 @@ test("login", async ({ page }) => {
 ### Cache Node Modules
 
 ```yaml
-- uses: actions/setup-node@v4
+- uses: actions/setup-node@v5
   with:
     node-version: 20
     cache: "npm"

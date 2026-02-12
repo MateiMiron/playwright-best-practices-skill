@@ -173,16 +173,13 @@ await page.getByRole("button").click();
 await page.waitForURL("/dashboard");
 await page.waitForURL(/\/dashboard/);
 
-// Wait for navigation after action
-await Promise.all([
-  page.waitForNavigation(),
-  page.click('a[href="/dashboard"]'),
-]);
+// Wait for navigation using waitForURL (recommended over deprecated waitForNavigation)
+await page.getByRole("link", { name: "Dashboard" }).click();
+await page.waitForURL("**/dashboard");
 
-// Or use Promise.all alternative
-const navigationPromise = page.waitForNavigation();
-await page.click("a");
-await navigationPromise;
+// Wait for any navigation
+await page.getByRole("link", { name: "Next" }).click();
+await page.waitForURL(/.*/);
 ```
 
 ### Wait for Network
@@ -345,6 +342,26 @@ await expect(page.getByRole("button")).toBeVisible({ timeout: 10000 });
 | Use `toPass()` for polling     | Write manual retry loops       |
 | Configure appropriate timeouts | Use `waitForTimeout()`         |
 | Check specific conditions      | Wait for arbitrary time        |
+
+### expect.configure()
+
+Configure assertion behavior globally or for a block of tests:
+
+```typescript
+// Increase timeout for all assertions in this block
+const slowExpect = expect.configure({ timeout: 10_000 });
+
+await slowExpect(page.getByText("Loaded")).toBeVisible();
+```
+
+```typescript
+// Enable soft assertions for a block
+const softExpect = expect.configure({ soft: true });
+
+await softExpect(page.getByText("Title")).toBeVisible();
+await softExpect(page.getByText("Subtitle")).toBeVisible();
+// Test continues even if assertions fail
+```
 
 ## Anti-Patterns to Avoid
 

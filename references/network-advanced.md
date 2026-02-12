@@ -445,6 +445,39 @@ export const test = base.extend<NetworkFixtures>({
 | No cleanup of routes     | Routes persist across tests    | Use fixtures with cleanup        |
 | Ignoring request method  | Mock applies to wrong requests | Check `route.request().method()` |
 | Hardcoded mock responses | Brittle, hard to maintain      | Use factories for mock data      |
+| Using route.fulfill() for redirects | Sends response body, doesn't trigger browser redirect | Use `route.fulfill({ status: 302, headers: { Location: url } })` or test redirect logic differently |
+
+## Route Abort Error Codes
+
+The `route.abort()` method accepts an optional error code parameter. Valid error codes:
+
+| Error Code              | Description                     |
+| ----------------------- | ------------------------------- |
+| `aborted`               | Operation was aborted (default) |
+| `accessdenied`          | Permission denied               |
+| `addressunreachable`    | Address unreachable             |
+| `blockedbyclient`       | Blocked by client               |
+| `blockedbyresponse`     | Blocked by response             |
+| `connectionaborted`     | Connection aborted              |
+| `connectionclosed`      | Connection closed               |
+| `connectionfailed`      | Connection failed               |
+| `connectionrefused`     | Connection refused              |
+| `connectionreset`       | Connection reset                |
+| `internetdisconnected`  | No internet connection          |
+| `namenotresolved`       | DNS name not resolved           |
+| `timedout`              | Operation timed out             |
+| `failed`                | Generic failure                 |
+
+```typescript
+// Abort with specific error
+await page.route("**/api/data", (route) => route.abort("connectionrefused"));
+
+// Simulate DNS failure
+await page.route("**/api/**", (route) => route.abort("namenotresolved"));
+
+// Simulate timeout
+await page.route("**/api/slow", (route) => route.abort("timedout"));
+```
 
 ## Related References
 

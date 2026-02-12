@@ -136,6 +136,42 @@ test("with custom provider", async ({ mount }) => {
 });
 ```
 
+
+### Unmounting Components
+
+The `mount()` function returns a component handle with an `unmount()` method for testing cleanup behavior:
+
+```tsx
+test("cleanup on unmount", async ({ mount }) => {
+  const component = await mount(<Timer />);
+
+  await expect(component.getByTestId("timer")).toBeVisible();
+
+  // Unmount the component
+  await component.unmount();
+
+  // Verify cleanup (e.g., no lingering timers)
+});
+```
+
+### Router Fixture
+
+Component tests provide a `router` fixture for mocking navigation without a full app router:
+
+```tsx
+test("navigation link", async ({ mount, router }) => {
+  const component = await mount(<NavLink to="/about">About</NavLink>);
+
+  // Mock the router
+  await router.goto("https://example.com/");
+
+  await component.click();
+
+  // Verify navigation was triggered
+  await expect(router).toHaveURL(/about/);
+});
+```
+
 ## Props & State Testing
 
 ### Testing Prop Variations

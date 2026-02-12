@@ -387,21 +387,25 @@ test("performance test", async ({ page }, testInfo) => {
 test("collect metrics", async ({ page }) => {
   await page.goto("/");
 
-  const metrics = await page.evaluate(() => ({
-    // Navigation timing
-    loadTime:
-      performance.timing.loadEventEnd - performance.timing.navigationStart,
-    domContentLoaded:
-      performance.timing.domContentLoadedEventEnd -
-      performance.timing.navigationStart,
+  const metrics = await page.evaluate(() => {
+    // Use Navigation Timing Level 2 API (performance.timing is deprecated)
+    const nav = performance.getEntriesByType(
+      "navigation",
+    )[0] as PerformanceNavigationTiming;
 
-    // Performance entries
-    resources: performance.getEntriesByType("resource").length,
+    return {
+      // Navigation timing (Level 2)
+      loadTime: nav.loadEventEnd - nav.startTime,
+      domContentLoaded: nav.domContentLoadedEventEnd - nav.startTime,
 
-    // Memory (Chrome only)
-    // @ts-ignore
-    memory: performance.memory?.usedJSHeapSize,
-  }));
+      // Performance entries
+      resources: performance.getEntriesByType("resource").length,
+
+      // Memory (Chrome only)
+      // @ts-ignore
+      memory: (performance as any).memory?.usedJSHeapSize,
+    };
+  });
 
   console.log("Metrics:", metrics);
   expect(metrics.loadTime).toBeLessThan(3000);
